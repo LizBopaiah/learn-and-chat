@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useChat, Chat, Message } from "@/context/ChatContext";
@@ -63,13 +62,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ folderId }) => {
   };
 
   const handlePdfUpload = (file: File, text: string) => {
-    const pdf = uploadPdf(file, text);
+    const newPdf = uploadPdf(file, text);
     setIsUploading(false);
     
-    // If we have a PDF, update the current chat to associate with this PDF
-    if (pdf && currentChat) {
-      // Since we're using the chat context for this, it will 
-      // automatically update the current chat and chats state
+    // If we have a PDF and a current chat, send a message about the upload
+    if (newPdf && currentChat) {
       sendMessage(`I've uploaded ${file.name}. Please help me understand its contents.`);
     }
   };
