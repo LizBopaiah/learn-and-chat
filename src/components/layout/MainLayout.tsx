@@ -3,6 +3,7 @@ import React from "react";
 import { Outlet, Navigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import Sidebar from "@/components/navigation/Sidebar";
+import TopBar from "@/components/navigation/TopBar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 
 export const MainLayout: React.FC = () => {
@@ -22,10 +23,13 @@ export const MainLayout: React.FC = () => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar />
-        <div className="flex-1 overflow-auto">
-          <Outlet />
+      <div className="min-h-screen flex flex-col w-full">
+        <TopBar />
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar />
+          <div className="flex-1 overflow-auto">
+            <Outlet />
+          </div>
         </div>
       </div>
     </SidebarProvider>
