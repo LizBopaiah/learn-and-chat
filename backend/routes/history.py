@@ -1,17 +1,29 @@
-from flask import Blueprint, request, jsonify, session
-from models import db, ChatHistory
+from flask import Blueprint, request, jsonify
+from models import get_chat_history, rename_chat_folder
 
 history_bp = Blueprint('history', __name__)
 
-@history_bp.route('/history', methods=['GET'])
+@history_bp.route('/get', methods=['GET'])
 def get_history():
-    history = ChatHistory.query.filter_by(user_id=session['user_id']).all()
-    return jsonify([{'id': h.id, 'question': h.question, 'answer': h.answer} for h in history])
+    email = request.args.get('email')
+    if not email:
+        return jsonify({'message': 'Email is required'}), 400
 
-@history_bp.route('/history', methods=['POST'])
-def save_history():
+    history = get_chat_history(email)
+    return jsonify({'history': history})
+
+@history_bp.route('/rename-folder', methods=['POST'])
+def rename_folder():
     data = request.get_json()
-    new_entry = ChatHistory(user_id=session['user_id'], question=data['question'], answer=data['answer'])
-    db.session.add(new_entry)
-    db.session.commit()
-    return jsonify({'message': 'Chat history saved'})
+    email = data.get('email')
+    old_name = data.get('old_folder_name')
+    new_name = data.get('new_folder_name')
+
+    if not all([email, old_name, new_name]):
+        return jsonify({'message': 'Email, old folder name, and new folder name are required'}), 400
+
+    success = rename_chat_folder(email, old_name, new_name)
+    if success:
+        return jsonify({'message': f'Folder renamed from {old_name} to {new_name}'})
+    else:
+        return jsonify({'message': 'Folder rename failed'}), 400

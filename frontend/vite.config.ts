@@ -19,4 +19,14 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    // 🔥 Key changes start here
+    outDir: "dist",       // Output built files to Flask's static folder
+    assetsDir: ".",                    // Keep assets in the static root, not nested
+    emptyOutDir: true,
+    rollupOptions: {
+      input: "./index.html",          // Use your React HTML entry point
+    }
+  },
+  base: "/", // Ensure assets load correctly from root
 }));

@@ -1,21 +1,23 @@
-from flask import Blueprint, request, jsonify, session
-from models import db, User
-from werkzeug.security import generate_password_hash
+from flask import Blueprint, request, jsonify
+from models import get_user, update_user
 
 profile_bp = Blueprint('profile', __name__)
 
-@profile_bp.route('/profile', methods=['GET'])
-def get_profile():
-    user = User.query.get(session['user_id'])
-    return jsonify({'name': user.name, 'email': user.email})
+@profile_bp.route('/<email>', methods=['GET'])
+def get_profile(email):
+    user = get_user(email)
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+    return jsonify({'user': user}), 200
 
-@profile_bp.route('/profile', methods=['PUT'])
-def update_profile():
+@profile_bp.route('/<email>', methods=['PUT'])
+def update_profile(email):
     data = request.get_json()
-    user = User.query.get(session['user_id'])
-    user.name = data.get('name', user.name)
-    user.email = data.get('email', user.email)
-    if data.get('password'):
-        user.password = generate_password_hash(data['password'], method='sha256')
-    db.session.commit()
-    return jsonify({'message': 'Profile updated successfully'})
+    name = data.get('name')
+    password = data.get('password')
+
+    updated_user = update_user(email, name, password)
+    if not updated_user:
+        return jsonify({'message': 'Update failed'}), 400
+
+    return jsonify({'message': 'Profile updated successfully', 'user': updated_user}), 200

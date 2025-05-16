@@ -1,0 +1,15 @@
+version: '3'
+services:
+  backend:
+    build:
+      context: .              # Use root as build context
+      dockerfile: Dockerfile  # Root-level Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_CX=${GOOGLE_CX}
+      - SECRET_KEY=${SECRET_KEY}
+    restart: unless-stopped
